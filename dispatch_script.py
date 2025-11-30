@@ -1,4 +1,4 @@
-import os, random;
+import os, random, base64;
 
 # input n amount of orders
 # output n amount of order data and print data pairs
@@ -38,6 +38,48 @@ filepath = 'generated_dispatch_orders.txt';
 defualt_filepath = 'generated_dispatch_orders.txt';
 count = 1;
 
+default_checkcode = """^XA
+^FO0,20,2^A0N,200,200^FB812,1,1,C^FD\&^FS
+^FO30,200^GB750,400,10,B,5^FS
+^FO0,280,2^A0N,200,200^FB812,1,1,C^FDA#CWM\&^FS
+^FO50,650,2^A0N,40,40^FB812,1,1,L^FDGONZ-210162^FS
+^FO50,700,2^A0N,30,30^FB750,20,7,L^FD99995000\&^FS
+^FO20,1250,2^A0N,30,30^FB812,1,1,L^FD09.10.25 14:34:44\&^FS
+^FO0,1280^GB812,0,6^FS
+^FO80,1370^BY4^BCN,200,Y,N^FD>511110000072114410302^FS
+^XZ"""
+
+def encode_checkcode():
+    encoded_checkcode = base64.b64encode(b'^XA^FO0,20,2^A0N,200,200^FB812,1,1,C^FD\&^FS^FO30,200^GB750,400,10,B,5^FS^FO0,280,2^A0N,200,200^FB812,1,1,C^FDA#CWM\&^FS^FO50,650,2^A0N,40,40^FB812,1,1,L^FDGONZ-210162^FS^FO50,700,2^A0N,30,30^FB750,20,7,L^FD99995000\&^FS^FO20,1250,2^A0N,30,30^FB812,1,1,L^FD09.10.25 14:34:44\&^FS^FO0,1280^GB812,0,6^FS^FO80,1370^BY4^BCN,200,Y,N^FD>511110000072114410302^FS^XZ');
+
+    encoded_checkcode = str(encoded_checkcode).replace("'", "").replace("b", "");
+    print(encoded_checkcode);
+
+# randomize checkcode
+# change last 3 character randomly
+# generate metadata
+# insert both into printdata
+
+starting_checkcode = "511110000072114410302";
+
+
+print(starting_checkcode);
+print(len(starting_checkcode));
+random_five_digit_num = random.randrange(10**5);
+    
+print(random_five_digit_num);
+split_checkcode_at = 16;
+split_checkcode = starting_checkcode[:split_checkcode_at];
+print(split_checkcode);
+new_checkcode = split_checkcode + str(random_five_digit_num);
+print(new_checkcode);
+print(len(new_checkcode));
+metadata_to_decode = """XlhBCl5GTzAsMjAsMl5BME4sMjAwLDIwMF5GQjgxMiwxLDEsQ15GRFwmXkZTCl5GTzMwLDIwMF5HQjc1MCw0MDAsMT
+AsQiw1XkZTCl5GTzAsMjgwLDJeQTBOLDIwMCwyMDBeRkI4MTIsMSwxLENeRkRBI0NXTVwmXkZTCl5GTzUwLDY1MCwyXkEwTiw0MCw0MF5GQjgxMiwx
+LDEsTF5GREdPTlotMjEwMTYyXkZTCl5GTzUwLDcwMCwyXkEwTiwzMCwzMF5GQjc1MCwyMCw3LExeRkQ5OTk5NTAwMFwmXkZTCl5GTzIwLDEyNTAsMl
+5BME4sMzAsMzBeRkI4MTIsMSwxLExeRkQwOS4xMC4yNSAxNDozNDo0NFwmXkZTCl5GTzAsMTI4MF5HQjgxMiwwLDZeRlMKXkZPODAsMTM3MF5CWTRe
+QkNOLDIwMCxZLE5eRkQ+NTExMTEwMDAwMDcyMTE0NDEwMzAyXkZTCl5YWg=="""
+
 order_data_template = [
     '<Host2KiSoft messageID="151">',
     '<OrderData orderNumber={orderNumber} sheetNumber="1">',
@@ -49,7 +91,6 @@ order_data_template = [
     '<ControlParameters>',
     '<ControlParameter>1</ControlParameter>',
     '</ControlParameters>',
-    '<MetaData>{metadata}</MetaData>'
     '</OrderData>',
     '</Host2KiSoft>',
 ]
@@ -61,10 +102,10 @@ print_data_template = [
     '<DispatchRampNumber>{dispatch_ramp}</DispatchRampNumber>',
     '</DispatchRampNumbers>',
     '<ControlParameters>',
-    '<ControlParameter>9003</ControlParameter>',
+    '<ControlParameter>11</ControlParameter>',
     '</ControlParameters>',
-    '<CheckCode>{511110000642114410302}</CheckCode>',
-    '<MetaData>{metadata}</MetaData>'
+    '<CheckCode>{checkcode}</CheckCode>',
+    '<MetaData>metadata</MetaData>',
     '</PrintDataMessage>',
     '</Host2KiSoft>',   
 ]
@@ -120,13 +161,25 @@ while True:
 print(f'Generating {orderAmount} orders with starting order number "{orderNumber}" and load unit code "{starting_load_unit_code}"...')
 
 startOrderNumber = orderNumber;
-starting_dispatch_ramp = 114
+starting_dispatch_ramp = 114;
 seq_dispatch_ramp = starting_dispatch_ramp;
+
+
 load_unit_code = starting_load_unit_code;
 
 for i in range(orderAmount):
     # random_dispatch_ramp = random.randrange(114, 127);
     seq_dispatch_ramp += 1;
+
+    print(starting_checkcode);
+    random_five_digit_num = random.randrange(10**5);
+    
+    print(random_five_digit_num);
+    split_checkcode_at = 16;
+    split_checkcode = starting_checkcode[:split_checkcode_at];
+    print(split_checkcode);
+    new_checkcode = split_checkcode + str(random_five_digit_num);
+    print(new_checkcode);
 
     if(i % 14 == 0):
         seq_dispatch_ramp = starting_dispatch_ramp;
@@ -145,7 +198,7 @@ for i in range(orderAmount):
 
     new_order_data = [line.format(orderNumber = orderNumber, load_unit_code = load_unit_code, dispatch_ramp = seq_dispatch_ramp)
                         for line in order_data_template];
-    new_print_data = [line.format(orderNumber=orderNumber, dispatch_ramp = seq_dispatch_ramp)
+    new_print_data = [line.format(orderNumber=orderNumber, dispatch_ramp = seq_dispatch_ramp, checkcode = new_checkcode)
                         for line in print_data_template];
 
 
