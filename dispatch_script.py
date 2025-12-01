@@ -58,21 +58,16 @@ def encode_checkcode(checkcode):
     checkcode_bytes = checkcode.encode("ascii");
 
     base64_bytes = base64.b64encode(checkcode_bytes);
-    print(base64_bytes);
     metadata = base64_bytes.decode("ascii");
-    print(metadata);
     return metadata;
 
 while(os.path.exists(filepath)): 
     count += 1;
     file_parts = defualt_filepath.split(".");
-    print(file_parts);
-    print("count: ", count);
     if(count <= 9):
         filepath = file_parts[0] + "_0" + str(count) + "." + file_parts[1];
     else:
         filepath = file_parts[0] + "_" + str(count) + "." + file_parts[1];
-    print(f'filepath to write to: {filepath}');
 
 print("Enter number of orders you would like to generate:")
 while True:
@@ -120,32 +115,22 @@ seq_dispatch_ramp = starting_dispatch_ramp;
 starting_checkcode = "11110000072114410302"
 
 load_unit_code = int(starting_load_unit_code);
-print(load_unit_code);
 
 for i in range(orderAmount):
     # random_dispatch_ramp = random.randrange(114, 127);
     seq_dispatch_ramp += 1;
 
-    print(starting_checkcode);
     random_five_digit_num = random.randrange(10**5);
     
-    print(random_five_digit_num);
     split_checkcode_at = 15;
     split_checkcode = starting_checkcode[:split_checkcode_at];
-    print(split_checkcode);
     new_checkcode = split_checkcode + str(random_five_digit_num);
-    
-    print(new_checkcode);
 
     split_default_checkcode_at = 339;
     split_default_checkcode = default_checkcode[:split_default_checkcode_at];
-    print(default_checkcode);
-    print(split_default_checkcode);
     new_checkcode_to_encode = split_default_checkcode + "5" + new_checkcode + "^FS" + "\n" + "^XZ";
-    print(new_checkcode_to_encode);
 
     encode_checkcode(new_checkcode_to_encode);
-    print(encode_checkcode(new_checkcode_to_encode));
 
     if(i % 14 == 0):
         seq_dispatch_ramp = starting_dispatch_ramp;
@@ -156,7 +141,7 @@ for i in range(orderAmount):
         orderNumber = startOrderNumber + "_0" + str(i + 1);
     
 
-    load_unit_code = f'{load_unit_code:08d}'
+    load_unit_code = f'{load_unit_code:08d}';
     new_order_data = [line.format(orderNumber = orderNumber, load_unit_code = load_unit_code, dispatch_ramp = seq_dispatch_ramp)
                         for line in order_data_template];
     new_print_data = [line.format(orderNumber=orderNumber, dispatch_ramp = seq_dispatch_ramp, checkcode = new_checkcode, metadata = encode_checkcode(new_checkcode_to_encode))
@@ -164,9 +149,7 @@ for i in range(orderAmount):
     
     load_unit_code = int(load_unit_code);
     load_unit_code += 1;
-    print(load_unit_code);
     
-
     # used if we want random dispatch ramp numbers 114-127, no error lane
     # new_order_data = [line.format(orderNumber = orderNumber, load_unit_code = load_unit_code, dispatch_ramp = random_dispatch_ramp)
     #             for line in order_data_template];
