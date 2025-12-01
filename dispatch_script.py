@@ -102,13 +102,11 @@ while True:
     try:
         starting_load_unit_code = input().strip();
         if not(len(starting_load_unit_code) == 8 and starting_load_unit_code.isdigit()):
-            print("her");
             raise ValueError;
         else:
             if("00000000" <= str(starting_load_unit_code) <= "99999999"): 
                 break;
             else:
-                print("ere");
                 raise ValueError;
     except ValueError:
         print("Invalid input, enter valid 8 digit starting load unit code:");
