@@ -100,11 +100,16 @@ while True:
 print('Enter starting 8 digit load unit code:')
 while True:
     try:
-        starting_load_unit_code = int(input());
-        if (00000000 < starting_load_unit_code <= 99999999) and (len(str(starting_load_unit_code)) == 8):
-            break;
-        else:
+        starting_load_unit_code = input().strip();
+        if not(len(starting_load_unit_code) == 8 and starting_load_unit_code.isdigit()):
+            print("her");
             raise ValueError;
+        else:
+            if("00000000" <= str(starting_load_unit_code) <= "99999999"): 
+                break;
+            else:
+                print("ere");
+                raise ValueError;
     except ValueError:
         print("Invalid input, enter valid 8 digit starting load unit code:");
 
@@ -116,7 +121,8 @@ seq_dispatch_ramp = starting_dispatch_ramp;
 
 starting_checkcode = "11110000072114410302"
 
-load_unit_code = starting_load_unit_code;
+load_unit_code = int(starting_load_unit_code);
+print(load_unit_code);
 
 for i in range(orderAmount):
     # random_dispatch_ramp = random.randrange(114, 127);
@@ -150,18 +156,24 @@ for i in range(orderAmount):
         orderNumber = startOrderNumber + "_" + str(i + 1);
     else:
         orderNumber = startOrderNumber + "_0" + str(i + 1);
-    load_unit_code = starting_load_unit_code + i;
+    
+
+    load_unit_code = f'{load_unit_code:08d}'
+    new_order_data = [line.format(orderNumber = orderNumber, load_unit_code = load_unit_code, dispatch_ramp = seq_dispatch_ramp)
+                        for line in order_data_template];
+    new_print_data = [line.format(orderNumber=orderNumber, dispatch_ramp = seq_dispatch_ramp, checkcode = new_checkcode, metadata = encode_checkcode(new_checkcode_to_encode))
+                        for line in print_data_template];
+    
+    load_unit_code = int(load_unit_code);
+    load_unit_code += 1;
+    print(load_unit_code);
+    
 
     # used if we want random dispatch ramp numbers 114-127, no error lane
     # new_order_data = [line.format(orderNumber = orderNumber, load_unit_code = load_unit_code, dispatch_ramp = random_dispatch_ramp)
     #             for line in order_data_template];
     # new_print_data = [line.format(orderNumber=orderNumber, dispatch_ramp = random_dispatch_ramp)
     #             for line in print_data_template];
-
-    new_order_data = [line.format(orderNumber = orderNumber, load_unit_code = load_unit_code, dispatch_ramp = seq_dispatch_ramp)
-                        for line in order_data_template];
-    new_print_data = [line.format(orderNumber=orderNumber, dispatch_ramp = seq_dispatch_ramp, checkcode = new_checkcode, metadata = encode_checkcode(new_checkcode_to_encode))
-                        for line in print_data_template];
 
 
     generated_order_data.append(new_order_data);
